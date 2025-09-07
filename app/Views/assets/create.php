@@ -99,7 +99,7 @@
                         <h5 class="card-title mb-0">Asset Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="/assets/store">
+                        <form method="POST" action="/assets/create">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">

@@ -99,7 +99,7 @@
                         <h5 class="mb-0">User Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/users/store">
+                        <form method="post" action="/users/create">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
