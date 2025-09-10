@@ -277,7 +277,7 @@
                                                 <td><?= date('M d, Y', strtotime($assessment['created_at'] ?? 'now')) ?></td>
                                                 <td>
                                                     <?php
-                                                    $feasibility = $assessment['feasibility_percentage'] ?? 0;
+                                                    $feasibility = $assessment['feasibility_score'] ?? 0;
                                                     $class = $feasibility >= 80 ? 'success' : ($feasibility >= 60 ? 'warning' : 'danger');
                                                     ?>
                                                     <span class="badge bg-<?= $class ?>"><?= number_format($feasibility, 1) ?>%</span>

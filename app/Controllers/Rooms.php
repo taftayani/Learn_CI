@@ -47,12 +47,12 @@ class Rooms extends BaseController
             return redirect()->to('/rooms')->with('error', 'Room not found');
         }
 
-        if ($this->request->getMethod() === 'POST') {
+        if ($this->request->getMethod() === 'PUT') {
             $data = [
-                'name' => $this->request->getPost('name'),
-                'description' => $this->request->getPost('description'),
-                'location' => $this->request->getPost('location'),
-                'capacity' => $this->request->getPost('capacity'),
+                'name' => $this->request->getVar('name'),
+                'description' => $this->request->getVar('description'),
+                'location' => $this->request->getVar('location'),
+                'capacity' => $this->request->getVar('capacity'),
             ];
 
             if ($this->roomModel->update($id, $data)) {

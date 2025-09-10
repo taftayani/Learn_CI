@@ -45,6 +45,16 @@
                             <a href="/room-assets" class="list-group-item list-group-item-action">
                                 <i class="fas fa-link"></i> Room-Asset Relations
                             </a>
+                        <?php elseif ($user_role === 'Leader'): ?>
+                            <a href="/users" class="list-group-item list-group-item-action active">
+                                <i class="fas fa-users"></i> View Users
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php if (in_array($user_role, ['Super Admin', 'Admin', 'Leader'])): ?>
+                            <a href="/assessments/admin" class="list-group-item list-group-item-action">
+                                <i class="fas fa-clipboard-list"></i> View All Assessments
+                            </a>
                         <?php endif; ?>
                         
                         <?php if ($user_role === 'GA Staff'): ?>
@@ -89,9 +99,11 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2><i class="fas fa-users"></i> User Management</h2>
-                    <a href="/users/create" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add New User
-                    </a>
+                    <?php if (in_array($user_role, ['Super Admin', 'Admin'])): ?>
+                        <a href="/users/create" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add New User
+                        </a>
+                    <?php endif; ?>
                 </div>
 
                 <div class="card">
@@ -142,14 +154,18 @@
                                                 </td>
                                                 <td><?= date('M d, Y', strtotime($user['created_at'])) ?></td>
                                                 <td>
-                                                    <a href="/users/edit/<?= $user['id'] ?>" class="btn btn-sm btn-outline-primary" title="Edit User">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <?php if ($user['id'] != session()->get('user_id')): ?>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger ms-1" 
-                                                                onclick="confirmDelete(<?= $user['id'] ?>, '<?= esc($user['name']) ?>')" title="Delete User">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
+                                                    <?php if (in_array($user_role, ['Super Admin', 'Admin'])): ?>
+                                                        <a href="/users/edit/<?= $user['id'] ?>" class="btn btn-sm btn-outline-primary" title="Edit User">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <?php if ($user['id'] != session()->get('user_id')): ?>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger ms-1" 
+                                                                    onclick="confirmDelete(<?= $user['id'] ?>, '<?= esc($user['name']) ?>')" title="Delete User">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        <?php endif; ?>
+                                                    <?php else: ?>
+                                                        <span class="text-muted small">View Only</span>
                                                     <?php endif; ?>
                                                 </td>
                                             </tr>

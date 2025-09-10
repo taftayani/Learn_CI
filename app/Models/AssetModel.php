@@ -22,8 +22,8 @@ class AssetModel extends Model
     
     protected $validationRules = [
         'name' => 'required|min_length[3]|max_length[100]',
-        'weight' => 'permit_empty|decimal',
-        'benefit_score' => 'permit_empty|decimal',
+        'weight' => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[10]',
+        'benefit_score' => 'permit_empty|decimal|greater_than_equal_to[0]|less_than_equal_to[10]',
     ];
     
     protected $skipValidation = false;

@@ -99,7 +99,7 @@
                         <h5 class="mb-0">Room Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/rooms/store" id="roomForm">
+                        <form method="post" action="/rooms/create" id="roomForm">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">

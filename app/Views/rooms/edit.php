@@ -99,7 +99,7 @@
                         <h5 class="mb-0">Room Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/rooms/update/<?= esc($room['id']) ?>" id="roomForm">
+                        <form method="post" action="/rooms/edit/<?= esc($room['id']) ?>" id="roomForm">
                             <input type="hidden" name="_method" value="PUT">
                             
                             <div class="row">

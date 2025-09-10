@@ -99,7 +99,7 @@
                         <h5 class="mb-0">User Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/users/update/<?= esc($edit_user['id']) ?>">
+                        <form method="post" action="/users/edit/<?= esc($edit_user['id']) ?>">
                             <input type="hidden" name="_method" value="PUT">
                             
                             <div class="row">

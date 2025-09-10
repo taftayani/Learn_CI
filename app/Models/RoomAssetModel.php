@@ -29,7 +29,15 @@ class RoomAssetModel extends Model
     
     public function getAssetsByRoom($roomId)
     {
-        return $this->select('assets.*')
+        return $this->select('
+                assets.id as asset_id,
+                assets.name as asset_name,
+                assets.category as asset_category,
+                assets.description as asset_description,
+                assets.weight,
+                assets.benefit_score,
+                room_assets.id as relation_id
+            ')
                    ->join('assets', 'assets.id = room_assets.asset_id')
                    ->where('room_assets.room_id', $roomId)
                    ->findAll();

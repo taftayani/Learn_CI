@@ -104,12 +104,12 @@
                                        placeholder="Room name or location..." value="<?= $search ?? '' ?>">
                             </div>
                             <div class="col-md-3">
-                                <label for="building" class="form-label">Building</label>
-                                <select class="form-select" id="building" name="building">
-                                    <option value="">All Buildings</option>
-                                    <?php if (isset($buildings)) foreach ($buildings as $building): ?>
-                                        <option value="<?= esc($building) ?>" <?= ($building_filter ?? '') == $building ? 'selected' : '' ?>>
-                                            <?= esc($building) ?>
+                                <label for="location" class="form-label">Location</label>
+                                <select class="form-select" id="location" name="location">
+                                    <option value="">All Locations</option>
+                                    <?php if (isset($locations)) foreach ($locations as $location): ?>
+                                        <option value="<?= esc($location) ?>" <?= ($location_filter ?? '') == $location ? 'selected' : '' ?>>
+                                            <?= esc($location) ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -161,7 +161,7 @@
                                     <div class="card-body">
                                         <div class="mb-2">
                                             <small class="text-muted">
-                                                <i class="fas fa-building"></i> <?= esc($room['building'] ?? 'N/A') ?>
+                                                <i class="fas fa-door-open"></i> Room #<?= $room['id'] ?>
                                             </small>
                                         </div>
                                         <div class="mb-2">
@@ -267,7 +267,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Auto-submit form on select change
-        document.getElementById('building').addEventListener('change', function() {
+        document.getElementById('location').addEventListener('change', function() {
             this.form.submit();
         });
         document.getElementById('status').addEventListener('change', function() {

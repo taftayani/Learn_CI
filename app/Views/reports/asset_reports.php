@@ -218,7 +218,7 @@
                                                 <td><?= isset($report['last_assessment']) ? date('M d, Y', strtotime($report['last_assessment'])) : 'Never' ?></td>
                                                 <td>
                                                     <?php
-                                                    $feasibility = $report['feasibility_percentage'] ?? 0;
+                                                    $feasibility = $report['feasibility_score'] ?? 0;
                                                     $feasibilityClass = $feasibility >= 80 ? 'success' : ($feasibility >= 60 ? 'warning' : 'danger');
                                                     ?>
                                                     <div class="d-flex align-items-center">
@@ -323,7 +323,7 @@
                 datasets: [
                     {
                         label: 'Feasibility %',
-                        data: <?= json_encode(array_column($asset_reports ?? [], 'feasibility_percentage')) ?>,
+                        data: <?= json_encode(array_column($asset_reports ?? [], 'feasibility_score')) ?>,
                         backgroundColor: 'rgba(54, 162, 235, 0.8)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 2
@@ -423,7 +423,7 @@
                             </div>
                             <div class="col-md-6">
                                 <h6>Latest Scores</h6>
-                                <p><strong>Feasibility:</strong> ${data.feasibility_percentage}%</p>
+                                <p><strong>Feasibility:</strong> ${data.feasibility_score}%</p>
                                 <p><strong>Physical Condition:</strong> ${data.physical_condition_score}%</p>
                                 <p><strong>Functionality:</strong> ${data.functionality_score}%</p>
                                 <p><strong>Safety Compliance:</strong> ${data.safety_compliance_score}%</p>

@@ -114,7 +114,7 @@
                             <a href="/assessments/export/pdf/<?= $assessment['id'] ?>" class="btn btn-outline-danger btn-sm">
                                 <i class="fas fa-file-pdf"></i> Export PDF
                             </a>
-                            <?php if ($user_role === 'GA Staff' && $assessment['assessed_by'] == $user_id): ?>
+                            <?php if ($user_role === 'GA Staff' && $assessment['user_id'] == $user_id): ?>
                                 <a href="/assessments/reassess/<?= $assessment['room_id'] ?>" class="btn btn-outline-warning btn-sm">
                                     <i class="fas fa-redo"></i> Reassess Room
                                 </a>
@@ -159,7 +159,7 @@
                             </div>
                             <div class="col-md-4 text-end">
                                 <?php 
-                                    $feasible = $assessment['is_feasible'];
+                                    $feasible = isset($assessment['is_feasible']) ? $assessment['is_feasible'] : ($assessment['score'] >= 7);
                                     $badgeClass = $feasible ? 'bg-success' : 'bg-danger';
                                     $icon = $feasible ? 'fa-check-circle' : 'fa-times-circle';
                                 ?>
@@ -175,8 +175,8 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3">
-                                <h4 class="text-primary"><?= number_format($assessment['total_score'], 1) ?></h4>
-                                <small class="text-muted">Overall Score</small>
+                                <h4 class="text-primary"><?= number_format($assessment['score'], 1) ?></h4>
+                                <small class="text-muted">Asset Score</small>
                             </div>
                             <div class="col-md-3">
                                 <h4 class="text-info"><?= count($asset_scores) ?></h4>
@@ -202,8 +202,8 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4">
-                                <strong>Building:</strong><br>
-                                <span class="text-muted"><?= esc($assessment['building'] ?? 'N/A') ?></span>
+                                <strong>Assessor:</strong><br>
+                                <span class="text-muted"><?= esc($assessment['assessor_name'] ?? 'N/A') ?></span>
                             </div>
                             <div class="col-md-4">
                                 <strong>Location:</strong><br>
@@ -355,9 +355,9 @@
                                 </ul>
                                 <div class="mt-3">
                                     <strong>This Assessment:</strong><br>
-                                    Score: <?= number_format($assessment['total_score'], 1) ?> → 
-                                    <span class="<?= $assessment['is_feasible'] ? 'text-success' : 'text-danger' ?>">
-                                        <?= $assessment['is_feasible'] ? 'Feasible' : 'Not Feasible' ?>
+                                    Score: <?= number_format($assessment['score'], 1) ?> → 
+                                    <span class="<?= (isset($assessment['is_feasible']) ? $assessment['is_feasible'] : ($assessment['score'] >= 7)) ? 'text-success' : 'text-danger' ?>">
+                                        <?= (isset($assessment['is_feasible']) ? $assessment['is_feasible'] : ($assessment['score'] >= 7)) ? 'Good Score' : 'Poor Score' ?>
                                     </span>
                                 </div>
                             </div>
@@ -382,11 +382,11 @@
                                             <?php endif; ?>
                                         </div>
                                         <div class="col-md-3 text-center">
-                                            <strong><?= number_format($hist['total_score'], 1) ?></strong>
+                                            <strong><?= number_format($hist['score'], 1) ?></strong>
                                         </div>
                                         <div class="col-md-3 text-center">
                                             <?php 
-                                                $histFeasible = $hist['is_feasible'];
+                                                $histFeasible = isset($hist['is_feasible']) ? $hist['is_feasible'] : ($hist['score'] >= 7);
                                                 $histBadgeClass = $histFeasible ? 'bg-success' : 'bg-danger';
                                             ?>
                                             <span class="badge <?= $histBadgeClass ?>">

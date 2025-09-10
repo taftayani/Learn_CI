@@ -17,6 +17,11 @@ class Users extends BaseController
 
     public function index()
     {
+        $userRole = session()->get('user_role');
+        if (!in_array($userRole, ['Super Admin', 'Admin', 'Leader'])) {
+            return redirect()->to('/dashboard')->with('error', 'Access denied');
+        }
+        
         $data = $this->getBaseViewData();
         $data['users'] = $this->userModel->findAll();
         return view('users/index', $data);
@@ -24,6 +29,11 @@ class Users extends BaseController
 
     public function create()
     {
+        $userRole = session()->get('user_role');
+        if (!in_array($userRole, ['Super Admin', 'Admin'])) {
+            return redirect()->to('/dashboard')->with('error', 'Access denied');
+        }
+        
         if ($this->request->getMethod() === 'POST') {
             $data = [
                 'name' => $this->request->getPost('name'),
@@ -44,20 +54,25 @@ class Users extends BaseController
 
     public function edit($id)
     {
+        $userRole = session()->get('user_role');
+        if (!in_array($userRole, ['Super Admin', 'Admin'])) {
+            return redirect()->to('/dashboard')->with('error', 'Access denied');
+        }
+        
         $user = $this->userModel->find($id);
         if (!$user) {
             return redirect()->to('/users')->with('error', 'User not found');
         }
 
-        if ($this->request->getMethod() === 'POST') {
+        if ($this->request->getMethod() === 'PUT') {
             $data = [
-                'name' => $this->request->getPost('name'),
-                'email' => $this->request->getPost('email'),
-                'role' => $this->request->getPost('role'),
+                'name' => $this->request->getVar('name'),
+                'email' => $this->request->getVar('email'),
+                'role' => $this->request->getVar('role'),
             ];
             
-            if ($this->request->getPost('password')) {
-                $data['password'] = $this->request->getPost('password');
+            if ($this->request->getVar('password')) {
+                $data['password'] = $this->request->getVar('password');
             }
 
             if ($this->userModel->update($id, $data)) {
@@ -68,12 +83,17 @@ class Users extends BaseController
         }
 
         $data = $this->getBaseViewData();
-        $data['user'] = $user;
+        $data['edit_user'] = $user;
         return view('users/edit', $data);
     }
 
     public function delete($id)
     {
+        $userRole = session()->get('user_role');
+        if (!in_array($userRole, ['Super Admin', 'Admin'])) {
+            return redirect()->to('/dashboard')->with('error', 'Access denied');
+        }
+        
         if (session()->get('user_id') == $id) {
             return redirect()->to('/users')->with('error', 'Cannot delete your own account');
         }

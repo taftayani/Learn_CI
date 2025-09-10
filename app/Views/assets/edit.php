@@ -99,7 +99,7 @@
                         <h5 class="card-title mb-0">Asset Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="/assets/update/<?= $asset['id'] ?>">
+                        <form method="POST" action="/assets/edit/<?= $asset['id'] ?>">
                             <input type="hidden" name="_method" value="PUT">
                             
                             <div class="row">

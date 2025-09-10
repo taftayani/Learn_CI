@@ -113,7 +113,7 @@
                             </div>
                         </div>
                         <small class="text-muted">
-                            <span id="completedCount">0</span> of <?= count($room_assets) ?> assets assessed
+                            <span id="completedCount">0</span> of <?= count($assets ?? []) ?> assets assessed
                         </small>
                     </div>
                 </div>
@@ -179,8 +179,8 @@
                                 <span class="text-muted"><?= esc($room['name']) ?></span>
                             </div>
                             <div class="col-md-4">
-                                <strong>Building:</strong><br>
-                                <span class="text-muted"><?= esc($room['building'] ?? 'N/A') ?></span>
+                                <strong>Room ID:</strong><br>
+                                <span class="text-muted">#<?= $room['id'] ?></span>
                             </div>
                             <div class="col-md-4">
                                 <strong>Location:</strong><br>
@@ -197,10 +197,10 @@
                 </div>
 
                 <!-- Assessment Form -->
-                <form id="assessmentForm" method="post" action="/assessments/store">
+                <form id="assessmentForm" method="post" action="/assessments/save">
                     <input type="hidden" name="room_id" value="<?= $room['id'] ?>">
                     
-                    <?php if (empty($room_assets)): ?>
+                    <?php if (empty($assets)): ?>
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>
                             No assets are assigned to this room. Please contact an administrator to add assets before assessment.
@@ -208,7 +208,7 @@
                     <?php else: ?>
                         <!-- Asset Assessment Cards -->
                         <div class="row" id="assetsContainer">
-                            <?php foreach ($room_assets as $index => $asset): ?>
+                            <?php foreach ($assets as $index => $asset): ?>
                                 <div class="col-lg-6 mb-4">
                                     <div class="card asset-card" data-asset-id="<?= $asset['asset_id'] ?>">
                                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -243,7 +243,7 @@
                                                     <input type="number" 
                                                            class="form-control score-input" 
                                                            id="score_<?= $asset['asset_id'] ?>" 
-                                                           name="scores[<?= $asset['asset_id'] ?>]" 
+                                                           name="assessments[<?= $asset['asset_id'] ?>]"
                                                            min="1" 
                                                            max="10" 
                                                            step="1" 
@@ -322,7 +322,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const totalAssets = <?= count($room_assets) ?>;
+        const totalAssets = <?= count($assets ?? []) ?>;
         const feasibilityThreshold = 7.0; // Configurable threshold
         
         function updateProgress() {

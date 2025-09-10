@@ -47,7 +47,7 @@ class Assessments extends BaseController
         $userId = session()->get('user_id');
         $data['assessments'] = $this->assessmentModel->getAssessmentWithDetails($userId);
 
-        return view('assessments/staff_index', $data);
+        return view('assessments/index', $data);
     }
 
     protected function viewAllAssessments()
@@ -58,6 +58,16 @@ class Assessments extends BaseController
         $data['assessments'] = $this->assessmentModel->getAssessmentWithDetails();
 
         return view('assessments/admin_index', $data);
+    }
+    
+    public function adminIndex()
+    {
+        $userRole = session()->get('user_role');
+        if (!in_array($userRole, ['Super Admin', 'Admin', 'Leader'])) {
+            return redirect()->to('/dashboard')->with('error', 'Access denied');
+        }
+        
+        return $this->viewAllAssessments();
     }
 
     public function rooms()
@@ -75,7 +85,7 @@ class Assessments extends BaseController
 
         $data['rooms'] = $this->roomModel->findAll();
 
-        return view('assessments/select_room', $data);
+        return view('assessments/rooms', $data);
     }
 
     public function assessRoom($roomId = null)
@@ -85,7 +95,7 @@ class Assessments extends BaseController
         }
 
         if (session()->get('user_role') !== 'GA Staff') {
-            return redirect()->to('/dashboard')->with('error', 'Access denied');
+            return redirect()->to('/dashboard')->with('error', 'Only GA Staff can perform assessments');
         }
 
         if (!$roomId) {
@@ -113,37 +123,34 @@ class Assessments extends BaseController
     public function saveAssessment()
     {
         if (!session()->get('logged_in')) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Not authenticated']);
+            return redirect()->to('/login');
         }
 
         if (session()->get('user_role') !== 'GA Staff') {
-            return $this->response->setJSON(['success' => false, 'message' => 'Access denied']);
+            return redirect()->to('/dashboard')->with('error', 'Access denied');
         }
 
         $validation = \Config\Services::validation();
         $validation->setRules([
             'room_id' => 'required|integer',
             'assessments' => 'required',
-            'notes' => 'permit_empty|max_length[500]'
+            'overall_notes' => 'permit_empty|max_length[500]'
         ]);
 
         if (!$validation->withRequest($this->request)->run()) {
-            return $this->response->setJSON([
-                'success' => false, 
-                'message' => 'Validation failed',
-                'errors' => $validation->getErrors()
-            ]);
+            return redirect()->back()->withInput()->with('errors', $validation->getErrors());
         }
 
         $roomId = $this->request->getPost('room_id');
         $assessments = $this->request->getPost('assessments');
-        $notes = $this->request->getPost('notes') ?? '';
+        $overallNotes = $this->request->getPost('overall_notes') ?? '';
+        $notes = $this->request->getPost('notes') ?? [];
         $userId = session()->get('user_id');
 
         // Validate room exists
         $room = $this->roomModel->find($roomId);
         if (!$room) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Room not found']);
+            return redirect()->back()->with('error', 'Room not found');
         }
 
         $this->assessmentModel->db->transStart();
@@ -177,7 +184,7 @@ class Assessments extends BaseController
                 'room_id' => $roomId,
                 'asset_id' => $assetId,
                 'score' => (int)$score,
-                'notes' => $notes
+                'notes' => isset($notes[$assetId]) ? $notes[$assetId] : $overallNotes
             ];
 
             if ($existing) {
@@ -199,19 +206,10 @@ class Assessments extends BaseController
 
         if ($this->assessmentModel->db->transStatus() === false || !empty($errors)) {
             $this->assessmentModel->db->transRollback();
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Failed to save some assessments',
-                'errors' => $errors,
-                'saved_count' => $savedCount
-            ]);
+            return redirect()->back()->with('error', 'Failed to save some assessments: ' . implode(', ', $errors));
         } else {
             $this->assessmentModel->db->transComplete();
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => "Successfully saved {$savedCount} assessments for {$room['name']}",
-                'saved_count' => $savedCount
-            ]);
+            return redirect()->to('/assessments/history')->with('success', "Successfully saved {$savedCount} assessments for {$room['name']}");
         }
     }
 
@@ -270,12 +268,8 @@ class Assessments extends BaseController
             return redirect()->to('/assessments')->with('error', 'Assessment not specified');
         }
 
-        $assessment = $this->assessmentModel->select('assessments.*, users.name as user_name, rooms.name as room_name, assets.name as asset_name')
-                                          ->join('users', 'users.id = assessments.user_id')
-                                          ->join('rooms', 'rooms.id = assessments.room_id')
-                                          ->join('assets', 'assets.id = assessments.asset_id')
-                                          ->find($assessmentId);
-
+        $assessment = $this->assessmentModel->getAssessmentSummaryByRoom($assessmentId);
+        
         if (!$assessment) {
             return redirect()->to('/assessments')->with('error', 'Assessment not found');
         }
@@ -291,6 +285,9 @@ class Assessments extends BaseController
         $data = $this->getBaseViewData();
         $data['title'] = 'Assessment Details';
         $data['assessment'] = $assessment;
+        $data['asset_scores'] = [];
+        $data['score_distribution'] = ['poor' => 0, 'average' => 0, 'good' => 0, 'excellent' => 0];
+        $data['assessment_history'] = [];
 
         return view('assessments/details', $data);
     }

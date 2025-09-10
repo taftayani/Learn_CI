@@ -211,27 +211,28 @@
                                                     <i class="fas fa-door-open"></i> <?= esc($assessment['room_name']) ?>
                                                 </h6>
                                                 <small class="text-muted">
-                                                    <i class="fas fa-building"></i> <?= esc($assessment['building'] ?? 'N/A') ?>
-                                                    <?php if ($assessment['location']): ?>
-                                                        | <i class="fas fa-map-marker-alt"></i> <?= esc($assessment['location']) ?>
+                                                    <?php if (isset($assessment['location']) && $assessment['location']): ?>
+                                                        <i class="fas fa-map-marker-alt"></i> <?= esc($assessment['location']) ?>
+                                                    <?php else: ?>
+                                                        <i class="fas fa-door-open"></i> Room Assessment
                                                     <?php endif; ?>
                                                 </small>
                                             </div>
                                             <div class="col-md-2 text-center">
                                                 <div class="badge bg-info fs-6">
-                                                    <?= number_format($assessment['total_score'], 1) ?>
+                                                    <?= number_format($assessment['score'], 1) ?>
                                                 </div>
-                                                <br><small class="text-muted">Score</small>
+                                                <br><small class="text-muted">Asset Score</small>
                                             </div>
                                             <div class="col-md-2 text-center">
                                                 <?php 
-                                                    $feasible = $assessment['is_feasible'];
+                                                    $feasible = isset($assessment['is_feasible']) ? $assessment['is_feasible'] : ($assessment['score'] >= 7);
                                                     $badgeClass = $feasible ? 'bg-success' : 'bg-danger';
                                                     $icon = $feasible ? 'fa-check-circle' : 'fa-times-circle';
                                                 ?>
                                                 <span class="badge <?= $badgeClass ?>">
                                                     <i class="fas <?= $icon ?>"></i> 
-                                                    <?= $feasible ? 'Feasible' : 'Not Feasible' ?>
+                                                    <?= $feasible ? 'Good' : 'Poor' ?>
                                                 </span>
                                             </div>
                                             <div class="col-md-2 text-center">

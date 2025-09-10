@@ -27,10 +27,8 @@ class Assets extends BaseController
                 'name' => $this->request->getPost('name'),
                 'description' => $this->request->getPost('description'),
                 'category' => $this->request->getPost('category'),
-                'purchase_date' => $this->request->getPost('purchase_date'),
-                'purchase_price' => $this->request->getPost('purchase_price'),
-                'condition' => $this->request->getPost('condition'),
-                'serial_number' => $this->request->getPost('serial_number'),
+                'weight' => $this->request->getPost('weight'),
+                'benefit_score' => $this->request->getPost('benefit_score'),
             ];
 
             if ($this->assetModel->insert($data)) {
@@ -50,15 +48,13 @@ class Assets extends BaseController
             return redirect()->to('/assets')->with('error', 'Asset not found');
         }
 
-        if ($this->request->getMethod() === 'POST') {
+        if ($this->request->getMethod() === 'PUT') {
             $data = [
-                'name' => $this->request->getPost('name'),
-                'description' => $this->request->getPost('description'),
-                'category' => $this->request->getPost('category'),
-                'purchase_date' => $this->request->getPost('purchase_date'),
-                'purchase_price' => $this->request->getPost('purchase_price'),
-                'condition' => $this->request->getPost('condition'),
-                'serial_number' => $this->request->getPost('serial_number'),
+                'name' => $this->request->getVar('name'),
+                'description' => $this->request->getVar('description'),
+                'category' => $this->request->getVar('category'),
+                'weight' => $this->request->getVar('weight'),
+                'benefit_score' => $this->request->getVar('benefit_score'),
             ];
 
             if ($this->assetModel->update($id, $data)) {

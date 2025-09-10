@@ -22,17 +22,23 @@ class RoomAssets extends BaseController
     public function index()
     {
         $data = $this->getBaseViewData();
-        $data['rooms'] = $this->roomModel->findAll();
-        $data['roomAssets'] = [];
+        $rooms = $this->roomModel->findAll();
         
-        foreach ($data['rooms'] as $room) {
-            $data['roomAssets'][$room['id']] = $this->roomAssetModel->getAssetsByRoom($room['id']);
+        // Add assets to each room
+        foreach ($rooms as &$room) {
+            $room['assets'] = $this->roomAssetModel->getAssetsByRoom($room['id']);
         }
+        
+        $data['rooms'] = $rooms;
+        $data['total_rooms'] = count($rooms);
+        $data['rooms_with_assets'] = count(array_filter($rooms, function($room) { return count($room['assets']) > 0; }));
+        $data['empty_rooms'] = count(array_filter($rooms, function($room) { return count($room['assets']) == 0; }));
+        $data['total_relations'] = array_sum(array_map(function($room) { return count($room['assets']); }, $rooms));
         
         return view('room_assets/index', $data);
     }
 
-    public function show($roomId)
+    public function showRoom($roomId)
     {
         $room = $this->roomModel->find($roomId);
         if (!$room) {
@@ -40,11 +46,12 @@ class RoomAssets extends BaseController
         }
 
         $data = $this->getBaseViewData();
+        $room['assets'] = $this->roomAssetModel->getAssetsByRoom($roomId);
         $data['room'] = $room;
-        $data['assets'] = $this->roomAssetModel->getAssetsByRoom($roomId);
-        $data['availableAssets'] = $this->getAvailableAssets($roomId);
+        $data['assets'] = $room['assets'];
+        $data['available_assets'] = $this->getAvailableAssets($roomId);
         
-        return view('room_assets/show', $data);
+        return view('room_assets/show_room', $data);
     }
 
     public function create($roomId = null)
@@ -117,6 +124,59 @@ class RoomAssets extends BaseController
         return view('room_assets/add_asset', $data);
     }
 
+    public function addAssets($roomId)
+    {
+        $room = $this->roomModel->find($roomId);
+        if (!$room) {
+            return redirect()->to('/room-assets')->with('error', 'Room not found');
+        }
+
+        if ($this->request->getMethod() === 'POST') {
+            $assetIds = $this->request->getPost('asset_ids');
+            
+            if (empty($assetIds)) {
+                return redirect()->back()->with('error', 'Please select at least one asset');
+            }
+
+            $successCount = 0;
+            $errors = [];
+
+            foreach ($assetIds as $assetId) {
+                // Check if relationship already exists
+                $existing = $this->roomAssetModel->where([
+                    'room_id' => $roomId,
+                    'asset_id' => $assetId
+                ])->first();
+
+                if (!$existing) {
+                    $data = [
+                        'room_id' => $roomId,
+                        'asset_id' => $assetId,
+                    ];
+
+                    if ($this->roomAssetModel->insert($data)) {
+                        $successCount++;
+                    } else {
+                        $asset = $this->assetModel->find($assetId);
+                        $errors[] = 'Failed to add ' . ($asset['name'] ?? 'Asset #' . $assetId);
+                    }
+                }
+            }
+
+            if ($successCount > 0) {
+                $message = $successCount . ' asset(s) added to room successfully';
+                if (!empty($errors)) {
+                    $message .= '. Some assets could not be added: ' . implode(', ', $errors);
+                }
+                return redirect()->to('/room-assets/show/' . $roomId)->with('success', $message);
+            } else {
+                return redirect()->back()->with('error', 'No assets were added. ' . implode(', ', $errors));
+            }
+        }
+
+        return redirect()->to('/room-assets/show/' . $roomId);
+    }
+
     public function removeAsset($roomId, $assetId)
     {
         $roomAsset = $this->roomAssetModel->where([
@@ -142,10 +202,10 @@ class RoomAssets extends BaseController
             return redirect()->to('/room-assets')->with('error', 'Room-Asset relationship not found');
         }
 
-        if ($this->request->getMethod() === 'POST') {
+        if ($this->request->getMethod() === 'PUT') {
             $data = [
-                'room_id' => $this->request->getPost('room_id'),
-                'asset_id' => $this->request->getPost('asset_id'),
+                'room_id' => $this->request->getVar('room_id'),
+                'asset_id' => $this->request->getVar('asset_id'),
             ];
 
             // Check if new relationship already exists (excluding current record)
@@ -183,9 +243,9 @@ class RoomAssets extends BaseController
         $assignedAssetIds = $this->roomAssetModel->where('room_id', $roomId)->findColumn('asset_id');
         
         if (empty($assignedAssetIds)) {
-            return $this->assetModel->findAll();
+            return $this->assetModel->select('id, name as asset_name, category, description as asset_description, weight, benefit_score')->findAll();
         }
         
-        return $this->assetModel->whereNotIn('id', $assignedAssetIds)->findAll();
+        return $this->assetModel->select('id, name as asset_name, category, description as asset_description, weight, benefit_score')->whereNotIn('id', $assignedAssetIds)->findAll();
     }
 }

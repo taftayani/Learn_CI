@@ -71,6 +71,12 @@
                             </a>
                         <?php endif; ?>
                         
+                        <?php if (in_array($user_role, ['Super Admin', 'Admin', 'Leader'])): ?>
+                            <a href="/assessments/admin" class="list-group-item list-group-item-action">
+                                <i class="fas fa-clipboard-list"></i> View All Assessments
+                            </a>
+                        <?php endif; ?>
+                        
                         <?php if ($user_role === 'GA Staff'): ?>
                             <a href="/assessments" class="list-group-item list-group-item-action">
                                 <i class="fas fa-clipboard-check"></i> Assessments
@@ -208,17 +214,17 @@
                             <div class="col-lg-6 col-xl-4 mb-4 room-item" 
                                  data-room-name="<?= esc(strtolower($room['name'])) ?>"
                                  data-room-location="<?= esc(strtolower($room['location'] ?? '')) ?>"
-                                 data-asset-count="<?= count($room['assets']) ?>">
+                                 data-asset-count="<?= count($room['assets'] ?? []) ?>">
                                 
-                                <div class="card room-card <?= count($room['assets']) == 0 ? 'empty-room' : '' ?> h-100">
+                                <div class="card room-card <?= count($room['assets'] ?? []) == 0 ? 'empty-room' : '' ?> h-100">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h6 class="mb-0 fw-bold">
                                             <i class="fas fa-door-open text-primary me-2"></i>
                                             <?= esc($room['name']) ?>
                                         </h6>
                                         <div>
-                                            <span class="badge <?= count($room['assets']) > 0 ? 'bg-success' : 'bg-secondary' ?>">
-                                                <?= count($room['assets']) ?> assets
+                                            <span class="badge <?= count($room['assets'] ?? []) > 0 ? 'bg-success' : 'bg-secondary' ?>">
+                                            <?= count($room['assets'] ?? []) ?> assets
                                             </span>
                                         </div>
                                     </div>
@@ -242,16 +248,16 @@
                                         </div>
 
                                         <!-- Assets List -->
-                                        <?php if (count($room['assets']) > 0): ?>
+                                        <?php if (count($room['assets'] ?? []) > 0): ?>
                                             <div class="mb-3">
                                                 <small class="fw-bold text-muted mb-2 d-block">Associated Assets:</small>
                                                 <div class="d-flex flex-wrap">
                                                     <?php foreach ($room['assets'] as $asset): ?>
                                                         <span class="badge bg-primary asset-badge me-1 mb-1" 
                                                               data-bs-toggle="tooltip" 
-                                                              title="Weight: <?= $asset['weight_score'] ?> | Benefit: <?= $asset['benefit_score'] ?>">
-                                                            <i class="fas fa-cube"></i> <?= esc($asset['name']) ?>
-                                                            <span class="badge-score ms-1">(W:<?= $asset['weight_score'] ?>, B:<?= $asset['benefit_score'] ?>)</span>
+                                                              title="Weight: <?= $asset['weight'] ?> | Benefit: <?= $asset['benefit_score'] ?>">
+                                                            <i class="fas fa-cube"></i> <?= esc($asset['asset_name']) ?>
+                                                            <span class="badge-score ms-1">(W:<?= $asset['weight'] ?>, B:<?= $asset['benefit_score'] ?>)</span>
                                                         </span>
                                                     <?php endforeach; ?>
                                                 </div>

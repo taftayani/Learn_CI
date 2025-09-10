@@ -58,7 +58,7 @@ class AssessmentModel extends Model
     
     public function getAssessmentWithDetails($userId = null)
     {
-        $builder = $this->select('assessments.*, users.name as user_name, rooms.name as room_name, assets.name as asset_name')
+        $builder = $this->select('assessments.*, users.name as user_name, rooms.name as room_name, rooms.location, assets.name as asset_name')
                         ->join('users', 'users.id = assessments.user_id')
                         ->join('rooms', 'rooms.id = assessments.room_id')
                         ->join('assets', 'assets.id = assessments.asset_id');
@@ -69,4 +69,14 @@ class AssessmentModel extends Model
         
         return $builder->findAll();
     }
+
+    public function getAssessmentSummaryByRoom($assessmentId)
+    {
+        return $this->select('assessments.*, users.name as assessor_name, rooms.name as room_name, rooms.location, rooms.description as room_description')
+                    ->join('users', 'users.id = assessments.user_id')
+                    ->join('rooms', 'rooms.id = assessments.room_id')
+                    ->find($assessmentId);
+    }
+
+
 }

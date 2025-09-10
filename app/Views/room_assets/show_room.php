@@ -183,23 +183,23 @@
                                     <div id="assetsList">
                                         <?php foreach ($room['assets'] as $asset): ?>
                                             <div class="asset-item border rounded p-3 mb-3" 
-                                                 data-asset-name="<?= esc(strtolower($asset['name'])) ?>"
-                                                 data-asset-category="<?= esc(strtolower($asset['category'] ?? '')) ?>">
+                                                 data-asset-name="<?= esc(strtolower($asset['asset_name'])) ?>"
+                                                 data-asset-category="<?= esc(strtolower($asset['asset_category'] ?? '')) ?>">
                                                 <div class="row align-items-center">
                                                     <div class="col-md-6">
                                                         <h6 class="mb-1">
                                                             <i class="fas fa-cube text-primary me-2"></i>
-                                                            <?= esc($asset['name']) ?>
+                                                            <?= esc($asset['asset_name']) ?>
                                                         </h6>
-                                                        <?php if (!empty($asset['category'])): ?>
+                                                        <?php if (!empty($asset['asset_category'])): ?>
                                                             <small class="text-muted">
-                                                                <i class="fas fa-tags"></i> <?= esc($asset['category']) ?>
+                                                                <i class="fas fa-tags"></i> <?= esc($asset['asset_category']) ?>
                                                             </small>
                                                         <?php endif; ?>
-                                                        <?php if (!empty($asset['description'])): ?>
+                                                        <?php if (!empty($asset['asset_description'])): ?>
                                                             <p class="mb-0 mt-1">
                                                                 <small class="text-muted">
-                                                                    <?= esc(strlen($asset['description']) > 100 ? substr($asset['description'], 0, 100) . '...' : $asset['description']) ?>
+                                                                    <?= esc(strlen($asset['asset_description']) > 100 ? substr($asset['asset_description'], 0, 100) . '...' : $asset['asset_description']) ?>
                                                                 </small>
                                                             </p>
                                                         <?php endif; ?>
@@ -208,7 +208,7 @@
                                                         <div class="d-flex align-items-center justify-content-center">
                                                             <div class="text-center me-3">
                                                                 <div class="badge bg-info score-badge">
-                                                                    Weight: <?= $asset['weight_score'] ?>
+                                                                    Weight: <?= $asset['weight'] ?>
                                                                 </div>
                                                             </div>
                                                             <div class="text-center">
@@ -220,7 +220,7 @@
                                                     </div>
                                                     <div class="col-md-2 text-end">
                                                         <button type="button" class="btn btn-sm btn-outline-danger" 
-                                                                onclick="confirmRemoveAsset(<?= $asset['id'] ?>, '<?= esc($asset['name']) ?>')">
+                                                                onclick="confirmRemoveAsset(<?= $asset['asset_id'] ?>, '<?= esc($asset['asset_name']) ?>')">
                                                             <i class="fas fa-times"></i> Remove
                                                         </button>
                                                     </div>
@@ -284,7 +284,7 @@
                                 <?php foreach ($available_assets as $asset): ?>
                                     <div class="asset-select-item border rounded p-2 mb-2" 
                                          data-asset-id="<?= $asset['id'] ?>"
-                                         data-asset-name="<?= esc(strtolower($asset['name'])) ?>"
+                                         data-asset-name="<?= esc(strtolower($asset['asset_name'])) ?>"
                                          data-asset-category="<?= esc(strtolower($asset['category'] ?? '')) ?>">
                                         <div class="form-check">
                                             <input class="form-check-input asset-checkbox" 
@@ -295,7 +295,7 @@
                                             <label class="form-check-label w-100" for="asset_<?= $asset['id'] ?>">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
-                                                        <strong><?= esc($asset['name']) ?></strong>
+                                                        <strong><?= esc($asset['asset_name']) ?></strong>
                                                         <?php if (!empty($asset['category'])): ?>
                                                             <br><small class="text-muted">
                                                                 <i class="fas fa-tags"></i> <?= esc($asset['category']) ?>
@@ -303,7 +303,7 @@
                                                         <?php endif; ?>
                                                     </div>
                                                     <div class="text-end">
-                                                        <span class="badge bg-info score-badge me-1">W: <?= $asset['weight_score'] ?></span>
+                                                        <span class="badge bg-info score-badge me-1">W: <?= $asset['weight'] ?></span>
                                                         <span class="badge bg-success score-badge">B: <?= $asset['benefit_score'] ?></span>
                                                     </div>
                                                 </div>
